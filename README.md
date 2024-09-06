@@ -1,6 +1,6 @@
 # calculator_app
 
-### Simple calculator app without evaluating expressions.
+### Basic calculator app.
 
 - The **C/CE** button clears the last entry on **tap**, and clears the entire expression on **long press**.
 
