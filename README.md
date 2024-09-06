@@ -16,3 +16,7 @@
 - Entering a number while the initial **0** is displayed will replace it.
 - The user is prevented from entering more than one **0** at the beginning of a number.
 - The user is allowed to press the expression text field to edit the expression, and upon submitting (hitting enter) or pressing the **=** button, the expression will be evaluated.
+
+## Demo
+
+<img src="demo.gif" width="250"/>
