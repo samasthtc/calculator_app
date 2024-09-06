@@ -70,12 +70,8 @@ class _MyHomePageState extends State<MyHomePage> {
       (match) => match[0] == '÷' ? '/' : '*',
     );
 
-    final dotIndex = expression.indexOf('.');
-    if (_operators.contains(expression[
-            (dotIndex + 1) < expression.length ? dotIndex + 1 : dotIndex]) ||
-        expression.endsWith('.')) {
-      expression = expression.replaceFirst('.', '');
-    }
+    expression = removeTrailingDecimalPoints(expression);
+    devtools.log('expression: $expression');
 
     try {
       final parsedExpression = Expression.parse(expression);
@@ -97,6 +93,19 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  String removeTrailingDecimalPoints(String expression) {
+    final pattern = RegExp(r'\.(?=[+\-*/x÷]|\s*$)');
+
+    while (pattern.hasMatch(expression)) {
+      devtools.log(
+          'hasMatch: ${pattern.hasMatch(expression)}, expression: $expression');
+      expression = expression.replaceFirst(pattern, '');
+      devtools.log('expression: $expression');
+    }
+
+    return expression;
+  }
+
   void _appendNumToExpression(String value) {
     if (isResult) {
       _controller.text = value;
@@ -104,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
         isResult = false;
       });
     } else {
-      if (_controller.text == "0" && value != ".") {
+      if (_controller.text == "0") {
         _controller.text = value;
       } else {
         _controller.text += value;
@@ -118,10 +127,27 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _appendOperatorToExpression(String value) {
     final text = _controller.text;
+    String partAfterLastOperator = '';
+
+    if (value == '.') {
+      final lastOperatorIndex = text.lastIndexOf(RegExp(r'[+\-*/x÷]'));
+      if (lastOperatorIndex >= 0) {
+        partAfterLastOperator = text.substring(lastOperatorIndex + 1);
+      } else {
+        partAfterLastOperator = text;
+      }
+
+      if (partAfterLastOperator.contains('.')) return;
+      // if (partAfterLastOperator.endsWith('.')) return;
+    }
+
+    // if (text.endsWith('.') && value == ".") return;
 
     if (text.isNotEmpty) {
-      if (_isLastCharacterAnOperator()) {
+      if (_isLastCharacterAnOperator() && value != '.') {
         _controller.text = text.substring(0, text.length - 1) + value;
+      } else if (partAfterLastOperator.isEmpty && value == '.') {
+        _controller.text += "0$value";
       } else {
         _controller.text += value;
       }
